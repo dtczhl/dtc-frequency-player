@@ -2,6 +2,8 @@ This Android app emits sounds of user-specified frequencies
 
 <img src="./huawei_mate_20_screenshot.jpg" width="200" alt="Huawei Mate 20"/>
 
+(Sceenshot from Huawei Mate 20)
+
 ### Instructions
 There are three ways to specify the frequency
 
