@@ -5,6 +5,9 @@ This Android app emits sounds of user-specified frequencies
 (Screenshot from Huawei Mate 20)
 
 ### Instructions
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e1548dad7fc49c3bc8813c19901b10b)](https://app.codacy.com/app/dtczhl/dtc-frequency-player?utm_source=github.com&utm_medium=referral&utm_content=dtczhl/dtc-frequency-player&utm_campaign=Badge_Grade_Dashboard)
+
 There are three ways to specify the frequency
 
 *   type in the frequency
