@@ -15,20 +15,20 @@ There are three ways to specify the frequency
 The interface to the phone speaker is the `PlaySound` class. The supported frequency of sounds is from 1 Hz to 24k Hz.
 
 1.  play sound
-    ```java
-    PlaySound mPlaySound = new PlaySound();
-    mPlaySound.mOutputFreq = your_frequency;
-    mPlaySound.start();
-    ```
+  ```java
+  PlaySound mPlaySound = new PlaySound();
+  mPlaySound.mOutputFreq = your_frequency;
+  mPlaySound.start();
+  ```
   You can change `mPlaySound.mOutputFreq` during the sound playing
 
 2.  stop
-    ```java
-    if (mPlaySound != null) {
-        mPlaySound.stop();
-        mPlaySound = null;
-    }
-    ```
+  ```java
+  if (mPlaySound != null) {
+      mPlaySound.stop();
+      mPlaySound = null;
+  }
+  ```
 
 ### Phones Tested
 
