@@ -1,7 +1,7 @@
-This Android app emits sounds of user-specified frequencies
+## This Android app emits sounds of user-specified frequencies
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-&nbsp; &nbsp;
+&nbsp;
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ca7d5f2614c4433995f8bfdc949a8967)](https://www.codacy.com/app/dtczhl/dtc-frequency-player?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dtczhl/dtc-frequency-player&amp;utm_campaign=Badge_Grade)
 
 <img src="./huawei_mate_20_screenshot.jpg" width="200" alt="Huawei Mate 20"/>
