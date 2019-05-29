@@ -39,6 +39,206 @@ public class MainActivity extends AppCompatActivity {
     private Timer mTimer;
     private double mStepInc;
 
+    private View.OnClickListener mBtn1_listener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Button button = (Button) v;
+
+            if (button.getText().toString().trim().toLowerCase().equals("play")) {
+                enableUI(false);
+                button.setEnabled(true);
+
+                if (mEditFreq.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Please Type in Frequency", Toast.LENGTH_LONG).show();
+                    enableUI(true);
+                } else {
+                    mFreq = Integer.parseInt(mEditFreq.getText().toString().trim());
+                    if (mFreq < 1 || mFreq > 24000) {
+                        Toast.makeText(getApplicationContext(), "Supported Freq Range: 1 - 24k Hz", Toast.LENGTH_LONG).show();
+
+                        enableUI(true);
+                    } else {
+                        // looks OK, play sound
+                        mPlaySound = new PlaySound();
+                        mPlaySound.mOutputFreq = mFreq;
+                        mPlaySound.start();
+
+                        mTextFreq.setText(mFreq + " Hz");
+                        button.setText("Stop");
+                    }
+                }
+            } else {
+                if (mPlaySound != null) {
+                    mPlaySound.stop();
+                    mPlaySound = null;
+                }
+
+                enableUI(true);
+                button.setText("Play");
+            }
+        }
+    };
+
+    private View.OnClickListener mBtn2_listener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Button button = (Button) v;
+
+            if (button.getText().toString().trim().toLowerCase().equals("play")) {
+                enableUI(false);
+                button.setEnabled(true);
+                mSeekBar.setEnabled(true);
+
+                mPlaySound = new PlaySound();
+                mPlaySound.mOutputFreq = mFreq;
+                mPlaySound.start();
+
+                mTextFreq.setText(mFreq + " Hz");
+                button.setText("Stop");
+
+                button.setText("Stop");
+            } else {
+                if (mPlaySound != null) {
+                    mPlaySound.stop();
+                    mPlaySound = null;
+                }
+
+                enableUI(true);
+                button.setText("Play");
+            }
+        }
+    };
+
+    private View.OnClickListener mBtn3_listener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Button button = (Button) v;
+
+            if (button.getText().toString().trim().toLowerCase().equals("play")) {
+                enableUI(false);
+                button.setEnabled(true);
+
+                if (mEditFromFreq.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "From Frequency is empty", Toast.LENGTH_LONG).show();
+                    enableUI(true);
+                    return;
+                }
+                if (mEditToFreq.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "To Frequency is empty", Toast.LENGTH_LONG).show();
+                    enableUI(true);
+                    return;
+                }
+                if (mEditDuration.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "Duration is empty", Toast.LENGTH_LONG).show();
+                    enableUI(true);
+                    return;
+                }
+
+                int fromFreq = Integer.parseInt(mEditFromFreq.getText().toString().trim());
+                int toFreq = Integer.parseInt(mEditToFreq.getText().toString().trim());
+                if (fromFreq < 1 || fromFreq > 24000 || toFreq < 1 || toFreq > 24000) {
+                    Toast.makeText(getApplicationContext(), "Supported Freq Range: 1 - 24k Hz", Toast.LENGTH_LONG).show();
+                    enableUI(true);
+                    return;
+                }
+
+                int duration = Integer.parseInt(mEditDuration.getText().toString().trim());
+                if (duration < 1) {
+                    Toast.makeText(getApplicationContext(), "Duration must > 1", Toast.LENGTH_LONG).show();
+                    enableUI(true);
+                    return;
+                }
+
+                mFreq = fromFreq;
+                mPlaySound = new PlaySound();
+                mPlaySound.mOutputFreq = mFreq;
+                mPlaySound.start();
+
+                mStepInc = 1.0 * (toFreq - fromFreq) / duration;
+                mTimer = new Timer();
+                mTimer.schedule(new TimerTask() {
+
+                    double tempFreq = mFreq;
+                    int countDown = Integer.parseInt(mEditDuration.getText().toString().trim());
+
+                    @Override
+                    public void run() {
+                        if (mPlaySound == null) return;
+
+                        if (countDown-- < 0) {
+                            if (mTimer != null) {
+                                mTimer.cancel();
+                                mTimer = null;
+                            }
+                            if (mPlaySound != null) {
+                                mPlaySound.stop();
+                                mPlaySound = null;
+                            }
+
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    enableUI(true);
+                                    mBtn3.setText("Play");
+                                }
+                            });
+                            return;
+                        }
+
+                        mFreq = (int) tempFreq;
+                        if (mPlaySound != null)
+                            mPlaySound.mOutputFreq = mFreq;
+
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mTextFreq.setText(mFreq + " Hz");
+                            }
+                        });
+
+                        tempFreq += mStepInc;
+                    }
+                }, 0, 1000);
+
+                button.setText("Stop");
+            } else {
+
+                if (mTimer != null) {
+                    mTimer.cancel();
+                    mTimer = null;
+                }
+                if (mPlaySound != null) {
+                    mPlaySound.stop();
+                    mPlaySound = null;
+                }
+
+                enableUI(true);
+                button.setText("Play");
+            }
+        }
+    };
+
+    private SeekBar.OnSeekBarChangeListener mSeekBarListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            mFreq = progress;
+            mTextFreq.setText(mFreq + " Hz");
+            if (mPlaySound != null) {
+                mPlaySound.mOutputFreq = mFreq;
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,187 +250,13 @@ public class MainActivity extends AppCompatActivity {
     private void bindUI() {
 
         mBtn1 = findViewById(R.id.btn1);
-        mBtn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button button = (Button) v;
-
-                if (button.getText().toString().trim().toLowerCase().equals("play")) {
-                    enableUI(false);
-                    button.setEnabled(true);
-
-                    if (mEditFreq.getText().toString().trim().isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "Please Type in Frequency", Toast.LENGTH_LONG).show();
-                        enableUI(true);
-                    } else {
-                        mFreq = Integer.parseInt(mEditFreq.getText().toString().trim());
-                        if (mFreq < 1 || mFreq > 24000) {
-                            Toast.makeText(getApplicationContext(), "Supported Freq Range: 1 - 24k Hz", Toast.LENGTH_LONG).show();
-
-                            enableUI(true);
-                        } else {
-                            // looks OK, play sound
-                            mPlaySound = new PlaySound();
-                            mPlaySound.mOutputFreq = mFreq;
-                            mPlaySound.start();
-
-                            mTextFreq.setText(mFreq + " Hz");
-                            button.setText("Stop");
-                        }
-                    }
-                } else {
-                    if (mPlaySound != null) {
-                        mPlaySound.stop();
-                        mPlaySound = null;
-                    }
-
-                    enableUI(true);
-                    button.setText("Play");
-                }
-            }
-        });
+        mBtn1.setOnClickListener(mBtn1_listener);
 
         mBtn2 = findViewById(R.id.btn2);
-        mBtn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button button = (Button) v;
-
-                if (button.getText().toString().trim().toLowerCase().equals("play")) {
-                    enableUI(false);
-                    button.setEnabled(true);
-                    mSeekBar.setEnabled(true);
-
-                    mPlaySound = new PlaySound();
-                    mPlaySound.mOutputFreq = mFreq;
-                    mPlaySound.start();
-
-                    mTextFreq.setText(mFreq + " Hz");
-                    button.setText("Stop");
-
-                    button.setText("Stop");
-                } else {
-                    if (mPlaySound != null) {
-                        mPlaySound.stop();
-                        mPlaySound = null;
-                    }
-
-                    enableUI(true);
-                    button.setText("Play");
-                }
-            }
-        });
+        mBtn2.setOnClickListener(mBtn2_listener);
 
         mBtn3 = findViewById(R.id.btn3);
-        mBtn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button button = (Button) v;
-
-                if (button.getText().toString().trim().toLowerCase().equals("play")) {
-                    enableUI(false);
-                    button.setEnabled(true);
-
-                    if (mEditFromFreq.getText().toString().trim().isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "From Frequency is empty", Toast.LENGTH_LONG).show();
-                        enableUI(true);
-                        return;
-                    }
-                    if (mEditToFreq.getText().toString().trim().isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "To Frequency is empty", Toast.LENGTH_LONG).show();
-                        enableUI(true);
-                        return;
-                    }
-                    if (mEditDuration.getText().toString().trim().isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "Duration is empty", Toast.LENGTH_LONG).show();
-                        enableUI(true);
-                        return;
-                    }
-
-                    int fromFreq = Integer.parseInt(mEditFromFreq.getText().toString().trim());
-                    int toFreq = Integer.parseInt(mEditToFreq.getText().toString().trim());
-                    if (fromFreq < 1 || fromFreq > 24000 || toFreq < 1 || toFreq > 24000) {
-                        Toast.makeText(getApplicationContext(), "Supported Freq Range: 1 - 24k Hz", Toast.LENGTH_LONG).show();
-                        enableUI(true);
-                        return;
-                    }
-
-                    int duration = Integer.parseInt(mEditDuration.getText().toString().trim());
-                    if (duration < 1) {
-                        Toast.makeText(getApplicationContext(), "Duration must > 1", Toast.LENGTH_LONG).show();
-                        enableUI(true);
-                        return;
-                    }
-
-                    mFreq = fromFreq;
-                    mPlaySound = new PlaySound();
-                    mPlaySound.mOutputFreq = mFreq;
-                    mPlaySound.start();
-
-                    mStepInc = 1.0 * (toFreq - fromFreq) / duration;
-                    mTimer = new Timer();
-                    mTimer.schedule(new TimerTask() {
-
-                        double tempFreq = mFreq;
-                        int countDown = Integer.parseInt(mEditDuration.getText().toString().trim());
-
-                        @Override
-                        public void run() {
-                            if (mPlaySound == null) return;
-
-                            if (countDown-- < 0) {
-                                if (mTimer != null) {
-                                    mTimer.cancel();
-                                    mTimer = null;
-                                }
-                                if (mPlaySound != null) {
-                                    mPlaySound.stop();
-                                    mPlaySound = null;
-                                }
-
-                                mHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        enableUI(true);
-                                        mBtn3.setText("Play");
-                                    }
-                                });
-                                return;
-                            }
-
-                            mFreq = (int) tempFreq;
-                            if (mPlaySound != null)
-                                mPlaySound.mOutputFreq = mFreq;
-
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mTextFreq.setText(mFreq + " Hz");
-                                }
-                            });
-
-                            tempFreq += mStepInc;
-                        }
-
-                    }, 0, 1000);
-
-                    button.setText("Stop");
-                } else {
-
-                    if (mTimer != null) {
-                        mTimer.cancel();
-                        mTimer = null;
-                    }
-                    if (mPlaySound != null) {
-                        mPlaySound.stop();
-                        mPlaySound = null;
-                    }
-
-                    enableUI(true);
-                    button.setText("Play");
-                }
-            }
-        });
+        mBtn3.setOnClickListener(mBtn3_listener);
 
         mEditFreq = findViewById(R.id.editTextFreq);
         mEditFromFreq = findViewById(R.id.editFromFreq);
@@ -239,26 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
         mSeekBar = findViewById(R.id.seekBar);
 
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mFreq = progress;
-                mTextFreq.setText(mFreq + " Hz");
-                if (mPlaySound != null) {
-                    mPlaySound.mOutputFreq = mFreq;
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
+        mSeekBar.setOnSeekBarChangeListener(mSeekBarListener);
 
         mTextFreq = findViewById(R.id.textFreq);
     }
