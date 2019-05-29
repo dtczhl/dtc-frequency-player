@@ -1,4 +1,4 @@
-## This Android app emits sounds of user-specified frequencies
+## An Android app that emits sounds of user-specified frequencies
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 &nbsp;
