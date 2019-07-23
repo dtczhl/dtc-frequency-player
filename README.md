@@ -8,6 +8,8 @@
 
 (Screenshot from Huawei Mate 20)
 
+For a web application that has the similar functionality, please refer to my [dtc-web-audio-frequency](https://github.com/dtczhl/dtc-web-audio-frequency)
+
 ### Instructions
 There are three ways to specify the frequency
 
